@@ -1,6 +1,11 @@
 .borderRadius {
-  border-radius: 6px;
+    border-radius: 6px;
 }
+
 .roundedCircle {
-  border-radius: 100%;
+    border-radius: 100%;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

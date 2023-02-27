@@ -1,4 +1,7 @@
 import React from "react";
+import Movie from "../../../models/Movies";
+import mongoose from 'mongoose';
+
 import {
   Typography,
   Box,
@@ -50,9 +53,10 @@ const products = [
   },
 ];
 
-const ProductPerfomance = () => {
+export default function ProductPerfomance({movies}) {
+  console.log(movies)
   return (
-    <BaseCard title="Product Perfomance">
+    <BaseCard className="w-full" title="Product Perfomance">
       <Table
         aria-label="simple table"
         sx={{
@@ -69,29 +73,29 @@ const ProductPerfomance = () => {
             </TableCell>
             <TableCell>
               <Typography color="textSecondary" variant="h6">
-                Assigned
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
                 Name
               </Typography>
             </TableCell>
             <TableCell>
               <Typography color="textSecondary" variant="h6">
-                Priority
+                Image
+              </Typography>
+            </TableCell>
+            <TableCell>
+              <Typography color="textSecondary" variant="h6">
+                Year
               </Typography>
             </TableCell>
             <TableCell align="right">
               <Typography color="textSecondary" variant="h6">
-                Budget
+                Video
               </Typography>
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.name}>
+            <TableRow key={product._id}>
               <TableCell>
                 <Typography
                   sx={{
@@ -99,7 +103,7 @@ const ProductPerfomance = () => {
                     fontWeight: "500",
                   }}
                 >
-                  {product.id}
+                  {product._id}
                 </Typography>
               </TableCell>
               <TableCell>
@@ -116,7 +120,7 @@ const ProductPerfomance = () => {
                         fontWeight: "600",
                       }}
                     >
-                      {product.name}
+                      {product.title}
                     </Typography>
                     <Typography
                       color="textSecondary"
@@ -154,7 +158,15 @@ const ProductPerfomance = () => {
         </TableBody>
       </Table>
     </BaseCard>
-  );
-};
+  )
+}
 
-export default ProductPerfomance;
+export async function getServerSideProps(context) {
+  if (!mongoose.connections[0].readyState) {
+    await mongoose.connect('mongodb+srv://admin:PassworD@main.eemjamk.mongodb.net/PrMovies')
+  }
+  let movie = await Movie.find()
+  return {
+    props: { movies: JSON.parse(JSON.stringify(movie)) },
+  }
+}
