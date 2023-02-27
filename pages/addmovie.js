@@ -127,7 +127,7 @@ const AddMovie = () => {
           <br />
           <Button onClick={() => {
 
-            fetch(`https://premium-movies-admin/api/addMovie`, {
+            fetch(`https://premium-movies-admin.vercel.app/api/addMovie`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ title, slug, desc, imageUrl, videoUrl, releaseYear, cast }),
