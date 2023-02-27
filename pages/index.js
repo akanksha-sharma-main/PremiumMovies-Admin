@@ -197,7 +197,7 @@ export default function Index({products}) {
 
 export async function getServerSideProps(context) {
   if (!mongoose.connections[0].readyState) {
-    await mongoose.connect('mongodb://localhost:27017/prmovies')
+    await mongoose.connect('mongodb+srv://adityastudio:PassworD@cluster0.kllpeia.mongodb.net/?retryWrites=true&w=majority')
   }
   let movie = await Movie.find()
   return {

@@ -127,7 +127,7 @@ const AddMovie = () => {
           <br />
           <Button onClick={() => {
 
-            fetch(`http://localhost:3000/api/addMovie`, {
+            fetch(`https://premium-movies-admin/api/addMovie`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ title, slug, desc, imageUrl, videoUrl, releaseYear, cast }),
