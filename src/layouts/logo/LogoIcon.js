@@ -1,12 +1,11 @@
 import React from "react";
-import { Link } from "@mui/material";
-import Image from "next/image";
-import LogoDark from "../../../assets/images/logos/logo-dark.svg";
+import Link  from "next/link";
+import LogoDark from "../../../assets/images/logos/prl.jpg";
 
 const LogoIcon = () => {
   return (
     <Link href="/">
-      <Image src={LogoDark} alt={LogoDark} />
+      <img className="h-5 rounded-xl" src="../../../assets/images/logos/prl.jpg" alt={"logi"} />
     </Link>
   );
 };
