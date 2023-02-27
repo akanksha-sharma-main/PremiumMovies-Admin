@@ -6,12 +6,12 @@ const Menuitems = [
   },
   {
     title: "Add Movie",
-    icon: "plus",
+    icon: "file-plus",
     href: "/addmovie",
   },
   {
     title: "Remove Movie",
-    icon: "delete",
+    icon: "trash-2",
     href: "/removemovie",
   },
   // {

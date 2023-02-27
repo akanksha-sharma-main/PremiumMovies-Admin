@@ -1,11 +1,9 @@
 import { Grid } from "@mui/material";
-import BlogCard from "../src/components/dashboard/BlogCard";
+import {useState} from "react"
 import SalesOverview from "../src/components/dashboard/SalseOverview";
-import DailyActivity from "../src/components/dashboard/DailyActivity";
 import BaseCard from "../src/components/baseCard/BaseCard";
 import Movie from "../models/Movies";
 import mongoose from 'mongoose';
-import Image from "next/image";
 import { Card, CardContent,  Button  } from "@mui/material";
 import {
   Typography,
@@ -19,7 +17,13 @@ import {
 } from "@mui/material";
 
 export default function Index({products}) {
-  
+  const [showFullDesc, setShowDesc] = useState(Array(products.length).fill(false))
+
+  const handleShowMoreClick = (index) =>{
+    const updatedShowDesc = [...showFullDesc]
+    updatedShowDesc[index] = !updatedShowDesc[index]
+    setShowDesc(updatedShowDesc)
+  }
   return (
     <Grid container spacing={0}>
       <Grid item xs={12} lg={12}>
@@ -58,11 +62,6 @@ export default function Index({products}) {
             <TableCell>
               <Typography color="textSecondary" variant="h6">
                 Year
-              </Typography>
-            </TableCell>
-            <TableCell align="right">
-              <Typography color="textSecondary" variant="h6">
-                Video
               </Typography>
             </TableCell>
           </TableRow>
@@ -109,7 +108,7 @@ export default function Index({products}) {
               </TableCell>
               <TableCell>
                 <Typography color="textSecondary" className="h-10" variant="h6">
-                  <img className="rounded-lg" src={product.imageUrl}></img>
+                  <img className="rounded-md h-10" src={product.imageUrl}></img>
                 </Typography>
               </TableCell>
               <TableCell>
@@ -117,15 +116,12 @@ export default function Index({products}) {
                   sx={{
                     pl: "4px",
                     pr: "4px",
-                    backgroundColor: product.pbg,
+                    backgroundColor: "primary.main",
                     color: "#fff",
                   }}
                   size="small"
-                  label={product.priority}
+                  label={product.releaseYear}
                 ></Chip>
-              </TableCell>
-              <TableCell align="right">
-                <Typography variant="h6">${product.budget}k</Typography>
               </TableCell>
             </TableRow>
           ))}
@@ -152,7 +148,7 @@ export default function Index({products}) {
               width: "100%",
             }}
           >
-            <img src={`http://localhost:3000/${blog.imageUrl}`} alt="img" />
+            <img className="w-full" src={blog.imageUrl} alt="img" />
             <CardContent
               sx={{
                 paddingLeft: "30px",
@@ -168,15 +164,17 @@ export default function Index({products}) {
                 {blog.title}
               </Typography>
               <Typography
-                color="textSecondary"
-                sx={{
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  mt: 1,
-                }}
-              >
-                {blog.desc}
-              </Typography>
+                      color="textSecondary"
+                      sx={{
+                        fontSize: "14px",
+                        fontWeight: "400",
+                        mt: 1,
+                      }}
+                    >
+                      {showFullDesc[index] ? blog.desc :blog.desc.substring(0, 280)}<button className="ml-0.5 font-bold text-gray-800" onClick={()=>{handleShowMoreClick(index)}}
+                    >{showFullDesc[index] ? `${" "}Show less...` : `${" "}Show more...`}
+                    </button>
+                    </Typography>
               <Button
                 variant="contained"
                 sx={{
@@ -184,7 +182,7 @@ export default function Index({products}) {
                 }}
                 color={blog.btncolor}
               >
-                Learn More
+                View
               </Button>
             </CardContent>
           </Card>

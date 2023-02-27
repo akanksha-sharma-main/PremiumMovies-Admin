@@ -1,32 +1,21 @@
 import React, { useState } from 'react'
 import { Grid, Stack, TextField, Checkbox, FormGroup, FormControlLabel, Button } from "@mui/material";
 import BaseCard from "../src/components/baseCard/BaseCard";
-
-// const postDatas = () => {
-//   fetch('http://localhost:3000/api/addMovie', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ title, slug, desc, imageUrl, videoUrl, releaseYear, cast }),
-//   })
-
-//   console.log("data successfully submited");
-//   setTitle('')
-//   setSlug('')
-//   setDesc('')
-//   setImageUrl('')
-//   setVideoUrl('')
-//   setReleaseYear('')
-//   setCast('')
-// }
+import { Alert, AlertTitle } from "@mui/material";
+import Link from "next/link"
 
 const AddMovie = () => {
   const [title, setTitle] = useState()
-  const [slug, setSlug] = useState()
+  const [slug, setSlug] = useState('')
   const [desc, setDesc] = useState()
   const [imageUrl, setImageUrl] = useState()
   const [videoUrl, setVideoUrl] = useState()
   const [releaseYear, setReleaseYear] = useState()
   const [cast, setCast] = useState()
+  const [slugSuc, setSlugSuc] = useState("")
+  const [successVisible, setSuccessVisible] = useState(false)
+  const [errorVisible, setErrorVisible] = useState(false)
+
 
   const handleChange = (e) => {
     if (e.target.name == 'title') {
@@ -50,11 +39,6 @@ const AddMovie = () => {
       setDesc(e.target.value)
     }
   }
-
-
-
-
-
 
   return (
     <Grid container spacing={0}>
@@ -125,6 +109,14 @@ const AddMovie = () => {
               name="description"
               required
             />
+            {errorVisible && <Alert className={`fixed bottom-2 right-2 z-50`} severity="error">
+              <AlertTitle>Error</AlertTitle>
+              <strong className='cursor-pointer'>Sorry!</strong> We are unable to add your movie.
+            </Alert>}
+            {successVisible && <Alert className={`fixed bottom-2 right-2 z-50`} severity="success">
+              <AlertTitle>Success</AlertTitle>
+              Your Movie is added successfully <Link href={slugSuc}><strong className='cursor-pointer'>check it out!</strong></Link>
+            </Alert>}
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox defaultChecked />}
@@ -133,15 +125,27 @@ const AddMovie = () => {
             </FormGroup>
           </Stack>
           <br />
-          <button onClick={() => {
-            fetch(`${process.env.HOST_URI}/api/addMovie`, {
+          <Button onClick={() => {
+
+            fetch(`http://localhost:3000/api/addMovie`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ title, slug, desc, imageUrl, videoUrl, releaseYear, cast }),
+            }).then((response) => {if(response.status == 200){setSuccessVisible(true)}
+              setSlugSuc(slug)
+              setTitle('')
+              setDesc('')
+              setSlug('')
+              setCast('')
+              setVideoUrl('')
+              setImageUrl('')
+              setReleaseYear('')
             })
+            .catch(error => setErrorVisible(true))
+
           }} variant="contained" mt={2}>
             Submit
-          </button>
+          </Button>
 
         </BaseCard>
       </Grid>
