@@ -2,6 +2,8 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
+var CryptoJS = require("crypto-js");
+import { Alert, AlertTitle, Grid } from "@mui/material";
 import Head from "next/head";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -21,18 +23,73 @@ const clientSideEmotionCache = createEmotionCache();
 export default function MyApp(props) {
   const [open, setOpen] = useState("");
   const cancelButtonRef = useRef(null);
+  const [user, setUser] = useState(false);
   const [progress, setProgress] = useState(0);
   const router = useRouter();
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
-  useEffect(() => {
+  useEffect(async () => {
     router.events.on("routeChangeStart", () => {
       setProgress(40);
     });
     router.events.on("routeChangeComplete", () => {
       setProgress(100);
     });
+    const token = localStorage.getItem("token");
+    if (token) {
+      await setUser({ value: token });
+      setOpen("hidden");
+      await setLayoutKey(Math.random());
+    } else {
+      setUser({ value: null });
+      setOpen("");
+    }
   }, []);
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [successVisible, setSuccessVisible] = useState(false);
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [warnVisible, setWarnVisible] = useState(false);
+  const handleChange = (e) => {
+    if (e.target.name == "email") {
+      setEmail(e.target.value);
+    } else if (e.target.name == "password") {
+      setPassword(e.target.value);
+    }
+  };
+  const setLogout = () => {
+    setOpen(" ");
+  };
+  // o;oooooo
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (email && password != "") {
+      let res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      let response = await res.json();
+      if (response.success) {
+        setSuccessVisible(true);
+        setTimeout(() => setSuccessVisible(false), 3000);
+        await localStorage.setItem("token", JSON.stringify(response.token));
+        await localStorage.setItem("userKey", JSON.stringify(response.email));
+        await localStorage.setItem("name", JSON.stringify(response.name));
+        setEmail("");
+        setPassword("");
+        setOpen("hidden");
+        await router.push("/");
+        setLayoutKey(Math.random());
+      } else if (response.invalid) {
+        setWarnVisible(true);
+        setTimeout(() => setWarnVisible(false), 3000);
+      } else {
+        await setErrorVisible(true);
+        await setTimeout(() => setErrorVisible(false), 3000);
+      }
+    }
+  };
+  const [layoutKey, setLayoutKey] = useState(Math.random());
   return (
     <CacheProvider value={emotionCache}>
       <LoadingBar
@@ -40,22 +97,33 @@ export default function MyApp(props) {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
-      <div className={open} as={Fragment}>
+      {errorVisible && (
+        <Alert className={`fixed bottom-2 right-2 z-50`} severity="error">
+          <AlertTitle>Error</AlertTitle>
+          <strong className="cursor-pointer">Sorry!</strong> We are unable to
+          login you.
+        </Alert>
+      )}
+      {warnVisible && (
+        <Alert className={`fixed bottom-2 right-2 z-50`} severity="warning">
+          <AlertTitle>Warning</AlertTitle>
+          Invalid Credentials
+        </Alert>
+      )}
+      {successVisible && (
+        <Alert className={`fixed bottom-2 right-2 z-50`} severity="success">
+          <AlertTitle>Success</AlertTitle>
+          You are succesfully loggedin!
+        </Alert>
+      )}
+      <div className={open}>
         <div className="relative z-10">
           <div>
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
           </div>
           <div className="fixed inset-0 z-10 overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
+              <div className="ease-out duration-300 translate-y-4 sm:translate-y-0 sm:scale-95 ease-in">
                 <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div className="sm:flex sm:items-start">
@@ -79,18 +147,15 @@ export default function MyApp(props) {
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 py-3  sm:px-6">
-                    <form className="mt-8 space-y-6" action="#" method="POST">
-                      <input
-                        type="hidden"
-                        name="remember"
-                        defaultValue="true"
-                      />
+                    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                       <div className="-space-y-px rounded-md shadow-sm">
                         <div>
                           <label htmlFor="email-address" className="sr-only">
                             Email address
                           </label>
                           <input
+                            value={email}
+                            onChange={handleChange}
                             id="email-address"
                             name="email"
                             type="email"
@@ -105,6 +170,8 @@ export default function MyApp(props) {
                             Password
                           </label>
                           <input
+                            onChange={handleChange}
+                            value={password}
                             id="password"
                             name="password"
                             type="password"
@@ -130,15 +197,6 @@ export default function MyApp(props) {
                           >
                             Remember me
                           </label>
-                        </div>
-
-                        <div className="text-sm">
-                          <a
-                            href="#"
-                            className="font-medium text-indigo-600 hover:text-indigo-500"
-                          >
-                            Forgot your password?
-                          </a>
                         </div>
                       </div>
 
@@ -172,15 +230,8 @@ export default function MyApp(props) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
 
-        <FullLayout>
-          <div
-            onClick={() => {
-              setOpen(true);
-            }}
-          >
-            click
-          </div>
-          <Component {...pageProps} />
+        <FullLayout key={layoutKey} setlog={setLogout}>
+          <Component {...pageProps} setlog={setLogout}/>
         </FullLayout>
       </ThemeProvider>
     </CacheProvider>

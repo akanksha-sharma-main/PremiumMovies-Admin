@@ -1,28 +1,42 @@
-import { Fragment, useRef, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import * as React from 'react'
-import {
-  Grid,
-  Button,
-  Card,
-  CardContent,
-  Typography
-} from "@mui/material";
+import { Fragment, useRef, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import * as React from "react";
+import { Grid, Button, Card, CardContent, Typography } from "@mui/material";
 
-import mongoose from "mongoose"
-import Movie from "../models/Movies"
+import mongoose from "mongoose";
+import Movie from "../models/Movies";
 
 const RemoveMovie = ({ products }) => {
-  const [showMore, setShowMore] = useState(280)
-  const [open, setOpen] = useState(false)
-  const cancelButtonRef = useRef(null)
-  const [indexVal, setIndexVal] = useState(0)
-  const [thisKey, setThisKey] = useState(Math.random())
+  const [showMore, setShowMore] = useState(280);
+  // const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const cancelButtonRef = useRef(null);
+  const [indexVal, setIndexVal] = useState(0);
+  const [thisKey, setThisKey] = useState(Math.random());
+  // React.useEffect(async () => {
+  //   const token = localStorage.getItem("token");
+  //   const userKey = localStorage.getItem("userKey");
+  //   if (token && userKey) {
+  //     let res = await fetch("/api/getMovies", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ uploadedBy: userKey }),
+  //     });
+  //     let response = res.json();
+  //     console.log(response, "u", userKey);
+  //     setProducts(response.movies);
+  //   }
+  // }, []);
   return (
     <div>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setOpen}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          initialFocus={cancelButtonRef}
+          onClose={setOpen}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -50,16 +64,23 @@ const RemoveMovie = ({ products }) => {
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div className="sm:flex sm:items-start">
                       <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                        <ExclamationTriangleIcon
+                          className="h-6 w-6 text-red-600"
+                          aria-hidden="true"
+                        />
                       </div>
                       <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-base font-semibold leading-6 text-gray-900"
+                        >
                           Delete Movie
                         </Dialog.Title>
                         <div className="mt-2">
                           <p className="text-sm text-gray-500">
-                            Are you sure you want to delete your movie? Your Movie will be permanently
-                            removed. This action cannot be undone.
+                            Are you sure you want to delete your movie? Your
+                            Movie will be permanently removed. This action
+                            cannot be undone.
                           </p>
                         </div>
                       </div>
@@ -70,13 +91,13 @@ const RemoveMovie = ({ products }) => {
                       type="button"
                       className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
                       onClick={async () => {
-                        await fetch(`https://premium-movies-admin.vercel.app/api/removeMovie`, {
-                          method: 'DELETE',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({_id: products[indexVal]._id}),
-                        })
-                        await setOpen(false)
-                        await setThisKey(Math.random())
+                        await fetch(`/api/removeMovie`, {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ _id: products[indexVal]._id }),
+                        });
+                        await setOpen(false);
+                        await setThisKey(Math.random());
                       }}
                     >
                       Delete
@@ -84,7 +105,10 @@ const RemoveMovie = ({ products }) => {
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                      onClick={() => { setOpen(false); setIndexVal(null) }}
+                      onClick={() => {
+                        setOpen(false);
+                        setIndexVal(null);
+                      }}
                       ref={cancelButtonRef}
                     >
                       Cancel
@@ -98,88 +122,99 @@ const RemoveMovie = ({ products }) => {
       </Transition.Root>
       <Grid container spacing={0}>
         <Grid item xs={12} lg={12}>
-          <Grid key={thisKey} container>
-            {products.map((blog, index) => (
-              <Grid
-                key={blog._id}
-                item
-                xs={12}
-                lg={4}
-                sx={{
-                  display: "flex",
-                  alignItems: "stretch",
-                }}
-              >
-                <Card
+          {products && (
+            <Grid key={thisKey} container>
+              {products.map((blog, index) => (
+                <Grid
+                  key={blog._id}
+                  item
+                  xs={12}
+                  lg={4}
                   sx={{
-                    p: 0,
-                    width: "100%",
+                    display: "flex",
+                    alignItems: "stretch",
                   }}
                 >
-                  <img className='w-full' src={blog.imageUrl} alt="img" />
-                  <CardContent
+                  <Card
                     sx={{
-                      paddingLeft: "30px",
-                      paddingRight: "30px",
+                      p: 0,
+                      width: "100%",
                     }}
                   >
-                    <Typography
+                    <img className="w-full" src={blog.imageUrl} alt="img" />
+                    <CardContent
                       sx={{
-                        fontSize: "h4.fontSize",
-                        fontWeight: "500",
+                        paddingLeft: "30px",
+                        paddingRight: "30px",
                       }}
                     >
-                      {blog.title}
-                    </Typography>
-                    <Typography
-                      color="textSecondary"
-                      sx={{
-                        fontSize: "14px",
-                        fontWeight: "400",
-                        mt: 1,
-                      }}
-                    >
-                      {blog.desc.substr(0, showMore)}{blog.desc.length > 279 && showMore==280 && <button className="font-bold text-gray-800" onClick={ ()=>{
-                       if(showMore == 280){
-                        setShowMore(undefined)
-
-                       } else{
-                        setShowMore(280)
-                       }
-                       
-                    }}
-                    >
-                      {" "}Show more...
-                    </button>}{blog.desc.length > 279 && showMore==undefined && <button className="font-bold text-gray-800" onClick={ ()=>{
-                       if(showMore == undefined){
-                        setShowMore(280)
-
-                       } else{
-                        setShowMore(undefined)
-                       }
-                       
-                    }}
-                    >
-                      {" "}Show less...
-                    </button>}
-                    </Typography>
-                    <Button onClick={ ()=>{
-                       setIndexVal(index)
-                       setOpen(true)
-                    }}
-                      variant="contained"
-                      sx={{
-                        mt: "15px",
-                      }}
-                      color="error"
-                    >
-                      Delete
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                      <Typography
+                        sx={{
+                          fontSize: "h4.fontSize",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {blog.title}
+                      </Typography>
+                      <Typography
+                        color="textSecondary"
+                        sx={{
+                          fontSize: "14px",
+                          fontWeight: "400",
+                          mt: 1,
+                        }}
+                      >
+                        {blog.desc.substr(0, showMore)}
+                        {blog.desc.length > 279 && showMore == 280 && (
+                          <button
+                            className="font-bold text-gray-800"
+                            onClick={() => {
+                              if (showMore == 280) {
+                                setShowMore(undefined);
+                              } else {
+                                setShowMore(280);
+                              }
+                            }}
+                          >
+                            {" "}
+                            Show more...
+                          </button>
+                        )}
+                        {blog.desc.length > 279 && showMore == undefined && (
+                          <button
+                            className="font-bold text-gray-800"
+                            onClick={() => {
+                              if (showMore == undefined) {
+                                setShowMore(280);
+                              } else {
+                                setShowMore(undefined);
+                              }
+                            }}
+                          >
+                            {" "}
+                            Show less...
+                          </button>
+                        )}
+                      </Typography>
+                      <Button
+                        onClick={() => {
+                          setIndexVal(index);
+                          setOpen(true);
+                        }}
+                        variant="contained"
+                        sx={{
+                          mt: "15px",
+                        }}
+                        color="error"
+                      >
+                        Delete
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Grid>
       </Grid>
     </div>
@@ -187,13 +222,14 @@ const RemoveMovie = ({ products }) => {
 };
 
 export default RemoveMovie;
-
 export async function getServerSideProps(context) {
   if (!mongoose.connections[0].readyState) {
-    await mongoose.connect('mongodb+srv://adityastudio:PassworD@cluster0.kllpeia.mongodb.net/?retryWrites=true&w=majority')
+    await mongoose.connect(
+      "mongodb+srv://adityastudio:PassworD@cluster0.kllpeia.mongodb.net/?retryWrites=true&w=majority"
+    );
   }
-  let movie = await Movie.find()
+  let movie = await Movie.find({ uploadedBy: "aadisharma.in@gmail.com" });
   return {
     props: { products: JSON.parse(JSON.stringify(movie)) },
-  }
+  };
 }
