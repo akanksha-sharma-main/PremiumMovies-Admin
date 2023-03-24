@@ -158,7 +158,7 @@ export default function Index({ products }) {
       </Grid>
       <Grid item xs={12} lg={12}>
         <Grid container>
-          {products.map((blog, index) => (
+          {movies.length>0 && movies.map((blog, index) => (
             <Grid
               key={index}
               item

@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import * as React from "react";
@@ -7,27 +7,36 @@ import { useRouter } from "next/router";
 import mongoose from "mongoose";
 import Movie from "../models/Movies";
 
-const RemoveMovie = ({ products }) => {
+const RemoveMovie = ({}) => {
   const [showMore, setShowMore] = useState(280);
   // const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
   const [indexVal, setIndexVal] = useState(0);
   const [thisKey, setThisKey] = useState(Math.random());
-  // React.useEffect(async () => {
-  //   const token = localStorage.getItem("token");
-  //   const userKey = localStorage.getItem("userKey");
-  //   if (token && userKey) {
-  //     let res = await fetch("/api/getMovies", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ uploadedBy: userKey }),
-  //     });
-  //     let response = res.json();
-  //     console.log(response, "u", userKey);
-  //     setProducts(response.movies);
-  //   }
-  // }, []);
+  const [movies, setMovies] = useState({});
+  useEffect(async () => {
+    const token = localStorage.getItem("token");
+    const userKey = localStorage.getItem("userKey");
+    if (token && userKey) {
+      let res = await fetch("/api/getMovies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uploadedBy: JSON.parse(userKey) }),
+      });
+      let response = await res.json();
+      await setMovies(response.products);
+    }
+  }, []);
+  const [showFullDesc, setShowDesc] = useState(
+    Array(movies.length).fill(false)
+  );
+
+  const handleShowMoreClick = (index) => {
+    const updatedShowDesc = [...showFullDesc];
+    updatedShowDesc[index] = !updatedShowDesc[index];
+    setShowDesc(updatedShowDesc);
+  };
   const router = useRouter();
   return (
     <div>
@@ -124,9 +133,9 @@ const RemoveMovie = ({ products }) => {
       </Transition.Root>
       <Grid container spacing={0}>
         <Grid item xs={12} lg={12}>
-          {products && (
+          {movies.length > 0 && (
             <Grid key={thisKey} container>
-              {products.map((blog, index) => (
+              {movies.map((blog, index) => (
                 <Grid
                   key={blog._id}
                   item
@@ -166,37 +175,19 @@ const RemoveMovie = ({ products }) => {
                           mt: 1,
                         }}
                       >
-                        {blog.desc.substr(0, showMore)}
-                        {blog.desc.length > 279 && showMore == 280 && (
-                          <button
-                            className="font-bold text-gray-800"
-                            onClick={() => {
-                              if (showMore == 280) {
-                                setShowMore(undefined);
-                              } else {
-                                setShowMore(280);
-                              }
-                            }}
-                          >
-                            {" "}
-                            Show more...
-                          </button>
-                        )}
-                        {blog.desc.length > 279 && showMore == undefined && (
-                          <button
-                            className="font-bold text-gray-800"
-                            onClick={() => {
-                              if (showMore == undefined) {
-                                setShowMore(280);
-                              } else {
-                                setShowMore(undefined);
-                              }
-                            }}
-                          >
-                            {" "}
-                            Show less...
-                          </button>
-                        )}
+                        {showFullDesc[index]
+                          ? blog.desc
+                          : blog.desc.substring(0, 280)}
+                        <button
+                          className="ml-0.5 font-bold text-gray-800"
+                          onClick={() => {
+                            handleShowMoreClick(index);
+                          }}
+                        >
+                          {showFullDesc[index]
+                            ? `${" "}Show less...`
+                            : `${" "}Show more...`}
+                        </button>
                       </Typography>
                       <Button
                         onClick={() => {
