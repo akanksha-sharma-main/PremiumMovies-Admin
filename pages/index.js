@@ -36,8 +36,8 @@ export default function Index({ products }) {
         <DailyActivity />
       </Grid> */}
       <Grid item xs={12} lg={12}>
-        <BaseCard className="snap-x" title="Product Perfomance">
-          <Table
+        <BaseCard title="Product Perfomance">
+          <Table className="snap-x"
             aria-label="simple table"
             sx={{
               mt: 3,
@@ -70,7 +70,7 @@ export default function Index({ products }) {
             </TableHead>
             <TableBody>
               {products.map((product, index) => (
-                <TableRow key={product._id}>
+                <TableRow  key={product._id}>
                   <TableCell>
                     <Typography
                       sx={{

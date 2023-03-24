@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import * as React from "react";
 import { Grid, Button, Card, CardContent, Typography } from "@mui/material";
-
+import { useRouter } from "next/router";
 import mongoose from "mongoose";
 import Movie from "../models/Movies";
 
@@ -28,6 +28,7 @@ const RemoveMovie = ({ products }) => {
   //     setProducts(response.movies);
   //   }
   // }, []);
+  const router = useRouter();
   return (
     <div>
       <Transition.Root show={open} as={Fragment}>
@@ -98,6 +99,7 @@ const RemoveMovie = ({ products }) => {
                         });
                         await setOpen(false);
                         await setThisKey(Math.random());
+                        router.push("/removemovie");
                       }}
                     >
                       Delete
