@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SalesOverview from "../src/components/dashboard/SalseOverview";
 import BaseCard from "../src/components/baseCard/BaseCard";
 import Movie from "../models/Movies";
@@ -17,8 +17,25 @@ import {
 } from "@mui/material";
 
 export default function Index({ products }) {
+  const [movies, setMovies] = useState({});
+  useEffect(async () => {
+    const token = localStorage.getItem("token");
+    const userKey = localStorage.getItem("userKey");
+    if (token && userKey) {
+      let res = await fetch("/api/getMovies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uploadedBy: JSON.parse(userKey) }),
+      });
+      let response = await res.json();
+      console.log(response.products, "u", JSON.parse(userKey));
+      await setMovies(response.products);
+      console.log( movies.length );
+      console.log(products)
+    }
+  }, [] );
   const [showFullDesc, setShowDesc] = useState(
-    Array(products.length).fill(false)
+    Array(movies.length).fill(false)
   );
 
   const handleShowMoreClick = (index) => {
@@ -37,7 +54,8 @@ export default function Index({ products }) {
       </Grid> */}
       <Grid item xs={12} lg={12}>
         <BaseCard title="Product Perfomance">
-          <Table className="snap-x"
+          <Table
+            className="snap-x"
             aria-label="simple table"
             sx={{
               mt: 3,
@@ -69,8 +87,8 @@ export default function Index({ products }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.map((product, index) => (
-                <TableRow  key={product._id}>
+              {movies.length>0 && movies.map((product, index) => (
+                <TableRow key={product._id}>
                   <TableCell>
                     <Typography
                       sx={{
